@@ -29,7 +29,7 @@ WiFiClient espClient;
 PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
 char message_buff[100];
 
-void handleJpeg()
+void IRAM_ATTR handleJpeg()
 {
   digitalWrite(PIN_FLASH, HIGH);
   delay(100);
@@ -111,17 +111,23 @@ void initCam()
   delay(100);
 }
 
+void IRAM_ATTR motionDetect()
+{
+  clientMQTT.publish(TOPIC_CAMERASHOT, "");
+}
+
 void setup()
 {
   Serial.begin(115200);
   delay(100);
   pinMode(PIN_FLASH, OUTPUT);
+  // attachInterrupt(digitalPinToInterrupt(PIN_EVENT), motionDetect, FALLING);
   delay(100);
   // init cam
   initCam();
   // init wifi
-  WiFi.config(espIP, dns, gateway, subnet);
   WiFi.mode(WIFI_STA);
+  WiFi.config(espIP, dns, gateway, subnet);
   WiFi.setHostname(ESP_NAME);
   delay(100);
   // init MQTT
