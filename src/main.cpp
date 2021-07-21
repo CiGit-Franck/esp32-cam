@@ -3,23 +3,22 @@
  *
  * PIR <-+-> ESP GPIO2
  *       |
- *       +--> http://[espIP]/capture
- *       |
- *       +--> MQTT 
+ *       +--> MQTT --> Node-RED
+ *             |          |
+ *             +--> http://[espIP]/capture
+ * 
  */
 
-#include <Arduino.h>
-#include <esp32cam.h>
+#include <esp32cam.h>         // Simply manage OV2640 : https://github.com/yoursunny/esp32cam
 #include <WiFi.h>
 #include <WebServer.h>
-#include <PubSubClient.h> // MQTT
-#include "Credential.h"   // your private credential WiFi
+#include <PubSubClient.h>     // MQTT
+#include <soc/soc.h>          // Manage interrupt
+#include <soc/rtc_cntl_reg.h> // Manage interrupt
+#include "Credential.h"       // your private credential WiFi
 
 #define PIN_FLASH 4 // flah board linked on GPIO4
-#define PIN_EVENT 2 // event board linked on GPIO2
-
 #define ESP_NAME "ESP32-Cam"
-
 #define TOPIC_CAMERASHOT "cam/demo/shot"
 
 WebServer server(80);
@@ -29,7 +28,7 @@ WiFiClient espClient;
 PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
 char message_buff[100];
 
-void IRAM_ATTR handleJpeg()
+void handleJpeg()
 {
   digitalWrite(PIN_FLASH, HIGH);
   delay(100);
@@ -80,7 +79,7 @@ void connectWifi()
     if (WiFi.waitForConnectResult() != WL_CONNECTED)
       ;
 
-    // WiFi connected
+    // WiFi connected -> start server
     server.on("/capture", handleJpeg);
     server.begin();
   }
@@ -111,18 +110,36 @@ void initCam()
   delay(100);
 }
 
-void IRAM_ATTR motionDetect()
+static void IRAM_ATTR motionDetect(void *arg)
 {
-  clientMQTT.publish(TOPIC_CAMERASHOT, "");
+  clientMQTT.publish(TOPIC_CAMERASHOT, "", false);
+}
+
+  
+void addExternalInterrupt()
+{
+  // PIR Motion Sensor
+  esp_err_t err = gpio_install_isr_service(0);
+  err = gpio_isr_handler_add(GPIO_NUM_2, &motionDetect, (void *)2);
+  if (err != ESP_OK)
+  {
+    Serial.printf("handler add failed with error 0x%x \r\n", err);
+  }
+  err = gpio_set_intr_type(GPIO_NUM_2, GPIO_INTR_POSEDGE); // arduino rising mode
+  if (err != ESP_OK)
+  {
+    Serial.printf("set intr type failed with error 0x%x \r\n", err);
+  }
+  delay(100);
 }
 
 void setup()
 {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   Serial.begin(115200);
   delay(100);
   pinMode(PIN_FLASH, OUTPUT);
-  // attachInterrupt(digitalPinToInterrupt(PIN_EVENT), motionDetect, FALLING);
-  delay(100);
+  addExternalInterrupt();
   // init cam
   initCam();
   // init wifi
