@@ -1,35 +1,34 @@
 /*
  * Detection motion -> capture -> node-red
  *
- * PIR <-+-> ESP GPIO2
+ * PIR <-+-> ESP GPIO12
  *       |
- *       +--> http://[espIP]/capture
- *       |
- *       +--> MQTT 
+ *       +--> MQTT --> Node-RED
+ *       |     |          |
+ *       +-----+--> http://[espIP]/capture
+ * 
  */
 
-#include <Arduino.h>
-#include <esp32cam.h>
 #include <WiFi.h>
 #include <WebServer.h>
-#include <PubSubClient.h> // MQTT
-#include "Credential.h"   // your private credential WiFi
+#include <esp32cam.h>         // Simply manage OV2640 : https://github.com/yoursunny/esp32cam
+#include <PubSubClient.h>     // MQTT : https://github.com/knolleary/pubsubclient
+#include <soc/soc.h>          // Manage interrupt
+#include <soc/rtc_cntl_reg.h> // Manage interrupt
+#include "Credential.h"       // Your private credential WiFi
 
 #define PIN_FLASH 4 // flah board linked on GPIO4
-#define PIN_EVENT 2 // event board linked on GPIO2
-
 #define ESP_NAME "ESP32-Cam"
-
-#define TOPIC_CAMERASHOT "cam/demo/shot"
+#define TOPIC_CAMERASHOT "cam/demo"
+#define PIN_MOTION GPIO_NUM_12
 
 WebServer server(80);
 IPAddress espIP(192, 168, 0, 100); // Define static IP for dns, gatewaty & subnet put in Credential.h
 
 WiFiClient espClient;
 PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
-char message_buff[100];
 
-void handleJpeg()
+void capture()
 {
   digitalWrite(PIN_FLASH, HIGH);
   delay(100);
@@ -52,21 +51,9 @@ void handleJpeg()
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
-  Serial.print("Message arrived: [");
-  Serial.print(topic);
-  Serial.println("]"); // Prints out any topic that has arrived and is a topic that we subscribed to.
-
-  int i;
-  for (i = 0; i < length; i++)
-  {
-    message_buff[i] = payload[i];
-  }
-  message_buff[i] = '\0'; // We copy payload to message_buff because we can't make a string out of a byte based payload.
-
-  String msgString = String(message_buff); // Converting our payload to a string so we can compare it.
   if (strcmp(topic, TOPIC_CAMERASHOT) == 0)
   {
-    handleJpeg();
+    capture();
   }
 }
 
@@ -80,8 +67,8 @@ void connectWifi()
     if (WiFi.waitForConnectResult() != WL_CONNECTED)
       ;
 
-    // WiFi connected
-    server.on("/capture", handleJpeg);
+    // WiFi connected -> start server
+    server.on("/capture", capture);
     server.begin();
   }
   delay(100);
@@ -93,7 +80,7 @@ void connectWifi()
       clientMQTT.subscribe(TOPIC_CAMERASHOT);
     }
     else
-    { // failed with state
+    { 
       delay(5e3);
     }
   }
@@ -111,18 +98,27 @@ void initCam()
   delay(100);
 }
 
+void detectsMovement()
+{
+  capture();
+}
+
 void setup()
 {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   Serial.begin(115200);
   delay(100);
   pinMode(PIN_FLASH, OUTPUT);
+  digitalWrite(PIN_FLASH, LOW);
+  pinMode(PIN_MOTION, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN_MOTION), detectsMovement, RISING);
   delay(100);
   // init cam
   initCam();
-  // init wifi
-  WiFi.config(espIP, dns, gateway, subnet);
+  // init WiFi
   WiFi.mode(WIFI_STA);
   WiFi.setHostname(ESP_NAME);
+  WiFi.config(espIP, dns, gateway, subnet);
   delay(100);
   // init MQTT
   clientMQTT.setServer(mqttServer, mqttPort);
