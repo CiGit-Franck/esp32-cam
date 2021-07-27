@@ -23,6 +23,7 @@
 #define PIN_MOTION GPIO_NUM_12
 
 WebServer server(80);
+WiFiClient clientWiFi;
 IPAddress espIP(192, 168, 0, 100); // Define static IP for dns, gatewaty & subnet put in Credential.h
 
 WiFiClient espClient;
@@ -45,7 +46,7 @@ void capture()
 
   server.setContentLength(img->size());
   server.send(200, "image/jpeg");
-  WiFiClient clientWiFi = server.client();
+  clientWiFi = server.client();
   img->writeTo(clientWiFi);
 }
 
@@ -80,7 +81,7 @@ void connectWifi()
       clientMQTT.subscribe(TOPIC_CAMERASHOT);
     }
     else
-    { 
+    {
       delay(5e3);
     }
   }
@@ -98,7 +99,8 @@ void initCam()
   delay(100);
 }
 
-void detectsMovement()
+// void detectsMovement()
+static void IRAM_ATTR detectsMovement(void *arg)
 {
   capture();
 }
@@ -110,8 +112,18 @@ void setup()
   delay(100);
   pinMode(PIN_FLASH, OUTPUT);
   digitalWrite(PIN_FLASH, LOW);
-  pinMode(PIN_MOTION, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(PIN_MOTION), detectsMovement, RISING);
+  // attachInterrupt : https://github.com/espressif/esp-who/issues/90
+  esp_err_t err = gpio_isr_handler_add(PIN_MOTION, &detectsMovement, (void *)PIN_MOTION);
+  if (err != ESP_OK)
+  {
+    Serial.printf("handler add failed with error 0x%x \r\n", err);
+  }
+  err = gpio_set_intr_type(PIN_MOTION, GPIO_INTR_POSEDGE);
+  if(err != ESP_OK)
+  {
+    Serial.printf("set intr type failed with error 0x%x \r\n", err);
+  }
+
   delay(100);
   // init cam
   initCam();
