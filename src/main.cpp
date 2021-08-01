@@ -48,8 +48,9 @@ void capture()
   server.setContentLength(img->size());
   server.send(200, "image/jpeg");
   clientWiFi = server.client();
-  while (!img->writeTo(clientWiFi))
-    ;
+  img->writeTo(clientWiFi);
+  // if (!img->writeTo(clientWiFi))
+    // ;
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
