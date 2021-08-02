@@ -5,7 +5,7 @@
  *       |
  *       +--> MQTT --> Node-RED
  *       |     |          |
- *       +-----+--> http://[espIP]/capture
+ *       +-----+--> http://[espIP]/capture2
  * 
  */
 
@@ -28,7 +28,6 @@ IPAddress espIP(192, 168, 0, 100); // Define static IP for dns, gatewaty & subne
 
 WiFiClient espClient;
 PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
-const byte payload[] = {0x00};
 
 void capture()
 {
@@ -49,8 +48,6 @@ void capture()
   server.send(200, "image/jpeg");
   clientWiFi = server.client();
   img->writeTo(clientWiFi);
-  // if (!img->writeTo(clientWiFi))
-    // ;
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
