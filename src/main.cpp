@@ -7,6 +7,10 @@
  *       |     |          |
  *       +-----+--> http://[espIP]/capture2
  * 
+ * TODO : 
+ * - how to archive the captures on the rpi
+ * - view the stream
+ * - implement OTA
  */
 
 #include <WiFi.h>
@@ -17,7 +21,8 @@
 #include <soc/rtc_cntl_reg.h> // Manage interrupt
 #include "Credential.h"       // Your private credential WiFi
 
-#define PIN_FLASH 4 // flah board linked on GPIO4
+#define PIN_FLASH 4    // flah board linked on GPIO4
+#define LED_BUILTIN 33 // Onboard LED
 #define ESP_NAME "ESP32-Cam"
 #define TOPIC_CAMERASHOT "cam/demo"
 #define PIN_MOTION GPIO_NUM_12
@@ -28,6 +33,23 @@ IPAddress espIP(192, 168, 0, 100); // Define static IP for dns, gatewaty & subne
 
 WiFiClient espClient;
 PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
+
+volatile long lastMovementDetected = 0; // Used to debounce PIR
+volatile bool motionDetected = false;   // Set in ISR when PIR detected movement
+const long motionDelay = 5000;          // Delay between captures
+
+void blinkLED(int nb)
+{
+  for (int i = 0; i < nb; i++)
+  {
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(60);
+    digitalWrite(LED_BUILTIN, HIGH);
+
+    if (i < nb - 1)
+      delay(100);
+  }
+}
 
 void capture()
 {
@@ -41,8 +63,6 @@ void capture()
     server.send(503, "", "");
     return;
   }
-
-  Serial.printf("CAPTURE OK %dx%d %db\n", img->getWidth(), img->getHeight(), static_cast<int>(img->size()));
 
   server.setContentLength(img->size());
   server.send(200, "image/jpeg");
@@ -68,6 +88,7 @@ void connectWifi()
     if (WiFi.waitForConnectResult() != WL_CONNECTED)
       ;
 
+    blinkLED(2);
     // WiFi connected -> start server
     server.on("/capture", capture);
     server.begin();
@@ -82,7 +103,7 @@ void connectWifi()
     }
     else
     {
-      delay(5e3);
+      delay(3e3);
     }
   }
   delay(100);
@@ -101,7 +122,11 @@ void initCam()
 
 static void IRAM_ATTR detectsMovement(void *arg)
 {
-  capture();
+  if (millis() - lastMovementDetected > motionDelay)
+  {
+    motionDetected = true;
+    lastMovementDetected = millis();
+  }
 }
 
 void setup()
@@ -111,6 +136,8 @@ void setup()
   delay(100);
   pinMode(PIN_FLASH, OUTPUT);
   digitalWrite(PIN_FLASH, LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(100);
   // init cam
   initCam();
@@ -118,7 +145,7 @@ void setup()
   esp_err_t err = gpio_isr_handler_add(PIN_MOTION, &detectsMovement, (void *)PIN_MOTION);
   if (err != ESP_OK)
   {
-    Serial.printf("handler add failed with error 0x%x \r\n", err);
+    Serial.printf("interrupt handler add failed with error 0x%x \r\n", err);
   }
   err = gpio_set_intr_type(PIN_MOTION, GPIO_INTR_NEGEDGE);
   if (err != ESP_OK)
@@ -135,6 +162,7 @@ void setup()
   clientMQTT.setServer(mqttServer, mqttPort);
   clientMQTT.setCallback(callback);
   delay(100);
+  blinkLED(5);
 }
 
 void loop()
@@ -142,6 +170,11 @@ void loop()
   if (!clientMQTT.connected())
   {
     connectWifi();
+  }
+  if (motionDetected)
+  {
+    clientMQTT.publish(TOPIC_CAMERASHOT, "Motion");
+    motionDetected = false;
   }
   server.handleClient();
   clientMQTT.loop();
