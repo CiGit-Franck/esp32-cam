@@ -25,6 +25,7 @@
 #define LED_BUILTIN 33 // Onboard LED
 #define ESP_NAME "ESP32-Cam"
 #define TOPIC_CAMERASHOT "cam/demo"
+#define TOPIC_CAMERARAZ "cam/demo/restart"
 #define PIN_MOTION GPIO_NUM_12
 
 WebServer server(80);
@@ -75,6 +76,10 @@ void callback(char *topic, byte *payload, unsigned int length)
   if (strcmp(topic, TOPIC_CAMERASHOT) == 0)
   {
     capture();
+  }
+  else if (strcmp(topic, TOPIC_CAMERARAZ) == 0)
+  {
+    ESP.restart();
   }
 }
 
