@@ -1,1 +1,364 @@
-[{"id":"c9f4b4f2.2313a8","type":"debug","z":"f6f2187d.f17ca8","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":490,"y":160,"wires":[]},{"id":"83ad3e7.0799e4","type":"inject","z":"f6f2187d.f17ca8","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":120,"y":100,"wires":[["4ec71eac.0e5cd"]]},{"id":"4ec71eac.0e5cd","type":"http request","z":"f6f2187d.f17ca8","name":"","method":"POST","ret":"bin","paytoqs":"ignore","url":"http://192.168.0.100/capture","tls":"","persist":false,"proxy":"","authType":"","x":310,"y":120,"wires":[["c9f4b4f2.2313a8","c81b97d6.dfe91"]]},{"id":"f502f76.24d3a88","type":"mqtt out","z":"f6f2187d.f17ca8","name":"","topic":"cam/demo","qos":"","retain":"","respTopic":"","contentType":"","userProps":"","correl":"","expiry":"","broker":"69535ec4.9d939","x":310,"y":40,"wires":[]},{"id":"2656d280.0a4cee","type":"inject","z":"f6f2187d.f17ca8","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":120,"y":40,"wires":[["f502f76.24d3a88"]]},{"id":"f81d0b6d.2aafb","type":"mqtt in","z":"f6f2187d.f17ca8","name":"","topic":"cam/demo","qos":"2","datatype":"auto","broker":"69535ec4.9d939","nl":false,"rap":true,"rh":0,"x":120,"y":180,"wires":[["4ec71eac.0e5cd"]]},{"id":"2ebc38c7.b27bf8","type":"image viewer","z":"f6f2187d.f17ca8","name":"","width":160,"data":"payload","dataType":"msg","active":true,"x":650,"y":120,"wires":[[]]},{"id":"c81b97d6.dfe91","type":"jimp-image","z":"f6f2187d.f17ca8","name":"","data":"payload","dataType":"msg","ret":"img","parameter1":"","parameter1Type":"msg","parameter2":"","parameter2Type":"msg","parameter3":"","parameter3Type":"msg","parameter4":"","parameter4Type":"msg","parameter5":"","parameter5Type":"msg","parameter6":"","parameter6Type":"msg","parameter7":"","parameter7Type":"msg","parameter8":"","parameter8Type":"msg","sendProperty":"payload","sendPropertyType":"msg","parameterCount":0,"jimpFunction":"none","selectedJimpFunction":{"name":"none","fn":"none","description":"Just loads the image.","parameters":[]},"x":490,"y":120,"wires":[["2ebc38c7.b27bf8"]]},{"id":"2bf6888a.b27488","type":"ui_button","z":"f6f2187d.f17ca8","name":"","group":"251cb770.6534a8","order":1,"width":0,"height":0,"passthru":true,"label":"button","tooltip":"","color":"","bgcolor":"","icon":"","payload":"Node capture","payloadType":"str","topic":"topic","topicType":"msg","x":130,"y":140,"wires":[["4ec71eac.0e5cd"]]},{"id":"69535ec4.9d939","type":"mqtt-broker","name":"Pi3","broker":"192.168.0.30:1883","port":"1883","clientid":"","usetls":false,"protocolVersion":"3","keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","birthMsg":{},"closeTopic":"","closeQos":"0","closePayload":"","closeMsg":{},"willTopic":"","willQos":"0","willPayload":"","willMsg":{},"sessionExpiry":""},{"id":"251cb770.6534a8","type":"ui_group","name":"Default","tab":"ef6a796.4665808","order":1,"disp":true,"width":"6","collapse":false},{"id":"ef6a796.4665808","type":"ui_tab","name":"Home","icon":"dashboard","disabled":false,"hidden":false}]
+[
+    {
+        "id": "4c63010490475c9f",
+        "type": "mqtt out",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "topic": "cam/demo",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "016251d4939b891e",
+        "x": 270,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "1f516edabc548640",
+        "type": "inject",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 80,
+        "wires": [
+            [
+                "4c63010490475c9f"
+            ]
+        ]
+    },
+    {
+        "id": "c68b2be16c7d989a",
+        "type": "inject",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 40,
+        "wires": [
+            [
+                "50ea884b9a689666"
+            ]
+        ]
+    },
+    {
+        "id": "50ea884b9a689666",
+        "type": "mqtt out",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "topic": "cam/demo/restart",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "016251d4939b891e",
+        "x": 290,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "329c2ff211fd2577",
+        "type": "inject",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 180,
+        "wires": [
+            [
+                "088cfd00c94fe66d"
+            ]
+        ]
+    },
+    {
+        "id": "6646ed78f144d6b3",
+        "type": "image viewer",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "width": 160,
+        "data": "payload",
+        "dataType": "msg",
+        "active": true,
+        "x": 730,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dedabaca9b172d42",
+        "type": "mqtt in",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "topic": "cam/demo",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "016251d4939b891e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 100,
+        "y": 220,
+        "wires": [
+            [
+                "088cfd00c94fe66d"
+            ]
+        ]
+    },
+    {
+        "id": "056c36ad7499f848",
+        "type": "ui_button",
+        "z": "e39565e0ca3d234b",
+        "name": "",
+        "group": "ab27f99209881729",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "passthru": false,
+        "label": "button",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 250,
+        "y": 280,
+        "wires": [
+            [
+                "c41e54a354466068"
+            ]
+        ]
+    },
+    {
+        "id": "c41e54a354466068",
+        "type": "ui_template",
+        "z": "e39565e0ca3d234b",
+        "group": "ab27f99209881729",
+        "name": "",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "format": "<div>\n <img src=\"http://192.168.0.100/capture\" height=\"200\">\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 400,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fc616a58ea10c1f3",
+        "type": "group",
+        "z": "e39565e0ca3d234b",
+        "name": "Cam Motion detect",
+        "style": {
+            "label": true,
+            "stroke": "#ffdf7f",
+            "fill": "#ffefbf",
+            "color": "#3f3f3f"
+        },
+        "nodes": [
+            "088cfd00c94fe66d",
+            "67fea8921f09c0ed",
+            "60b7ebf554d7d09a"
+        ],
+        "x": 194,
+        "y": 159,
+        "w": 452,
+        "h": 82
+    },
+    {
+        "id": "088cfd00c94fe66d",
+        "type": "http request",
+        "z": "e39565e0ca3d234b",
+        "g": "fc616a58ea10c1f3",
+        "name": "http-request",
+        "method": "POST",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.0.100/capture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 290,
+        "y": 200,
+        "wires": [
+            [
+                "60b7ebf554d7d09a"
+            ]
+        ]
+    },
+    {
+        "id": "67fea8921f09c0ed",
+        "type": "jimp-image",
+        "z": "e39565e0ca3d234b",
+        "g": "fc616a58ea10c1f3",
+        "name": "",
+        "data": "payload",
+        "dataType": "msg",
+        "ret": "img",
+        "parameter1": "filename",
+        "parameter1Type": "msg",
+        "parameter2": "",
+        "parameter2Type": "msg",
+        "parameter3": "",
+        "parameter3Type": "msg",
+        "parameter4": "",
+        "parameter4Type": "msg",
+        "parameter5": "",
+        "parameter5Type": "msg",
+        "parameter6": "",
+        "parameter6Type": "msg",
+        "parameter7": "",
+        "parameter7Type": "msg",
+        "parameter8": "",
+        "parameter8Type": "msg",
+        "sendProperty": "payload",
+        "sendPropertyType": "msg",
+        "parameterCount": 1,
+        "jimpFunction": "write",
+        "selectedJimpFunction": {
+            "name": "write",
+            "fn": "write",
+            "description": "Write to file. NOTE: You can specify an alternative file extension type to change the type. Currently support types are jpg, png, bmp.",
+            "parameters": [
+                {
+                    "name": "filename",
+                    "type": "str",
+                    "required": true,
+                    "hint": "Name of the file",
+                    "defaultType": "str"
+                }
+            ]
+        },
+        "x": 570,
+        "y": 200,
+        "wires": [
+            [
+                "6646ed78f144d6b3"
+            ]
+        ]
+    },
+    {
+        "id": "60b7ebf554d7d09a",
+        "type": "function",
+        "z": "e39565e0ca3d234b",
+        "g": "fc616a58ea10c1f3",
+        "name": "",
+        "func": "var d = new Date();\n\nvar day=d.getDate()  //day as a number 0 -31\nif(day <= 9) day = \"0\" + day;\nvar month=d.getMonth() // month as a number 0-11\nif(month <= 9) month = \"0\" + (month + 1);\nvar year=d.getFullYear() //year as a four digit number (yyyy)\nvar hours=d.getHours() //the hour (0-23)\nif(hours <= 9) hours = \"0\" + hours;\nvar minutes=d.getMinutes() //-the minute (0-59)\nif(minutes <= 9) minutes = \"0\" + minutes;\nvar seconds=d.getSeconds() //-the seconds (0-59)\nif(seconds <= 9) seconds = \"0\" + seconds;\n\nvar date = year+\"-\"+month+\"-\"+day+\"/\";\nvar time = hours+\":\"+minutes+\":\"+seconds+\"-\";\n\nmsg.filename = \"/home/pi/dev-iot/cam-demo/\"+date+time+\"capture.jpg\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 200,
+        "wires": [
+            [
+                "67fea8921f09c0ed"
+            ]
+        ]
+    },
+    {
+        "id": "016251d4939b891e",
+        "type": "mqtt-broker",
+        "name": "Pi3",
+        "broker": "192.168.0.30:1883",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "3",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ab27f99209881729",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "debe45c5c0056a6c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "debe45c5c0056a6c",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

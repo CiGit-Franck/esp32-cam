@@ -5,7 +5,7 @@
  *       |
  *       +--> MQTT --> Node-RED
  *       |     |          |
- *       +-----+--> http://[espIP]/capture2
+ *       +-----+--> http://[espIP]/capture
  * 
  * TODO : 
  * - how to archive the captures on the rpi
@@ -37,7 +37,7 @@ PubSubClient clientMQTT(mqttServer, mqttPort, espClient);
 
 volatile long lastMovementDetected = 0; // Used to debounce PIR
 volatile bool motionDetected = false;   // Set in ISR when PIR detected movement
-const long motionDelay = 5000;          // Delay between captures
+const long motionDelay = 2000;          // Delay between captures
 
 void blinkLED(int nb)
 {
@@ -93,7 +93,7 @@ void connectWifi()
     if (WiFi.waitForConnectResult() != WL_CONNECTED)
       ;
 
-    blinkLED(2);
+    blinkLED(5);
     // WiFi connected -> start server
     server.on("/capture", capture);
     server.begin();
@@ -105,6 +105,7 @@ void connectWifi()
     if (clientMQTT.connect(ESP_NAME, mqttUser, mqttPassword))
     {
       clientMQTT.subscribe(TOPIC_CAMERASHOT);
+      clientMQTT.subscribe(TOPIC_CAMERARAZ);
     }
     else
     {
@@ -120,7 +121,7 @@ void initCam()
   esp32cam::Config cfg;
   cfg.setPins(esp32cam::pins::AiThinker);
   cfg.setResolution(res);
-  cfg.setJpeg(80);
+  cfg.setJpeg(100);
   esp32cam::Camera.begin(cfg);
   delay(100);
 }
