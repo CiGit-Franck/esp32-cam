@@ -158,53 +158,6 @@
         ]
     },
     {
-        "id": "056c36ad7499f848",
-        "type": "ui_button",
-        "z": "e39565e0ca3d234b",
-        "name": "",
-        "group": "ab27f99209881729",
-        "order": 3,
-        "width": "0",
-        "height": "0",
-        "passthru": false,
-        "label": "button",
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "icon": "",
-        "payload": "",
-        "payloadType": "date",
-        "topic": "topic",
-        "topicType": "msg",
-        "x": 250,
-        "y": 280,
-        "wires": [
-            [
-                "c41e54a354466068"
-            ]
-        ]
-    },
-    {
-        "id": "c41e54a354466068",
-        "type": "ui_template",
-        "z": "e39565e0ca3d234b",
-        "group": "ab27f99209881729",
-        "name": "",
-        "order": 1,
-        "width": "0",
-        "height": "0",
-        "format": "<div>\n <img src=\"http://192.168.0.100/capture\" height=\"200\">\n</div>",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "x": 400,
-        "y": 280,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "fc616a58ea10c1f3",
         "type": "group",
         "z": "e39565e0ca3d234b",
@@ -342,23 +295,5 @@
         "willPayload": "",
         "willMsg": {},
         "sessionExpiry": ""
-    },
-    {
-        "id": "ab27f99209881729",
-        "type": "ui_group",
-        "name": "Default",
-        "tab": "debe45c5c0056a6c",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "debe45c5c0056a6c",
-        "type": "ui_tab",
-        "name": "Home",
-        "icon": "dashboard",
-        "disabled": false,
-        "hidden": false
     }
 ]
